@@ -20,71 +20,95 @@ void squareRoot(double inputVal)
     double f = 1.0;
     double f_squareRoot = 1.0;
     int i = 0;
-    for(i; i<= 31; i++){
+    for (i; i <= 31; i++)
+    {
         // unsigned short int factor = 1 + shiftValueRightBy(1,i);
         // unsigned int precision = f * factor * factor;
         // unsigned int precision_squareRoot = f_squareRoot * factor;
-        
+
         //double factor = 1.0 + powerArray[i];
         double precision = f * (1.0 + powerArray[i]) * (1.0 + powerArray[i]);
         double precision_squareRoot = f_squareRoot * (1.0 + powerArray[i]);
 
-        if(precision <= inputVal){
+        if (precision <= inputVal)
+        {
             f = precision;
             f_squareRoot = precision_squareRoot;
         }
     }
 
-    if(printOutput) printf("\tThe Square Root is:\t\t%1.9lf\n",f_squareRoot);
+    if (printOutput)
+        printf("\tThe Square Root is:\t\t%1.9lf\n", f_squareRoot);
 }
 
-void cubeRoot (double M) {
+void cubeRoot(double M)
+{
 
     double f = 1.0;
     double f_sqrt_3 = 1.0;
 
     int i = 0;
-    for(i; i < 31; i++) {
-        double var = f*(1+powerArray[i])*(1+powerArray[i])*(1+powerArray[i]);
-        double var_sqrt_3 = f_sqrt_3*(1+powerArray[i] );
-        if(var <= M) {
+    for (i; i < 31; i++)
+    {
+        double var = f * (1 + powerArray[i]) * (1 + powerArray[i]) * (1 + powerArray[i]);
+        double var_sqrt_3 = f_sqrt_3 * (1 + powerArray[i]);
+        if (var <= M)
+        {
             f = var;
             f_sqrt_3 = var_sqrt_3;
         }
     }
-      
-    if(printOutput) printf("\tThe Cube Root is:\t\t%1.9lf\n", f_sqrt_3);
-    }
+
+    if (printOutput)
+        printf("\tThe Cube Root is:\t\t%1.9lf\n", f_sqrt_3);
+}
 
 #pragma endregion Modular_Functions
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     //unsigned short int inputVal = 3.5;
-    double inputVal = 4;
-    double inputVals[8] = {1,1.5,2,2.5,4,6,8,5.123456789};
+    double inputVals[8] = {1, 1.5, 2, 2.5, 4, 6, 8, 5.123456789};
 
     int i = 0;
-    for(i; i<8; i++){
+    for (i; i < 8; i++)
+    {
         double inputValue = inputVals[i];
-        if(printTime || printOutput){
+        if (printTime || printOutput)
+        {
             printf("\nInput value: \t\t\t\t%lf\n", inputValue);
         }
 
-        time_t start_squareRoot = time(NULL);
-        squareRoot(inputValue);
-        time_t end_squareRoot = time(NULL);
-        double squareRootTime = (double)(end_squareRoot - start_squareRoot);
-        if(printTime) printf("\tSquare Root Execution time: \t%lf seconds\n", squareRootTime);
+#pragma region SquareRoot
+        clock_t start_squareRoot, end_squareRoot, total_squareRoot;
 
+        start_squareRoot = clock();
+        squareRoot(inputValue);
+        end_squareRoot = clock();
+        total_squareRoot = (double)(end_squareRoot - start_squareRoot) / CLOCKS_PER_SEC;
+
+        if (printTime)
+        {
+            printf("\tSquare Root Execution time: \t%ld seconds\n", total_squareRoot);
+            //printf("\t%ld - %ld = \t%f seconds\n", end_squareRoot, start_squareRoot, total_squareRoot);
+        }
+#pragma endregion SquareRoot
+
+#pragma region CubeRoot
         clock_t start_cubeRoot, stop_cubeRoot = clock();
         gettimeofday(&start_cubeRoot, NULL);
         cubeRoot(inputValue);
         gettimeofday(&stop_cubeRoot, NULL);
-        float cubeRootTime = (stop_cubeRoot - start_cubeRoot)/CLOCKS_PER_SEC;
-        if(printTime) printf("\tCube Root Execution took \t%f seconds\n", cubeRootTime);
+        float cubeRootTime = (float)(stop_cubeRoot - start_cubeRoot) / (float)CLOCKS_PER_SEC;
+
+        if (printTime)
+        {
+            printf("\tCube Root Execution took \t%f seconds\n", cubeRootTime);
+            //printf("\t%lf - %lf = \t%f seconds\n", stop_cubeRoot, start_cubeRoot, cubeRootTime);
+        }
+#pragma endregion CubeRoot
     }
+
     printf("\n");
     return 0;
 }
-

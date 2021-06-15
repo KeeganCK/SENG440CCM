@@ -45,13 +45,3 @@ case $executionOption in
         echo -e "\nInvalid Entry\n\n\t ! TERMINATING SCRIPT !\n"
         exit
 esac
-# gcc -o qRoot qRoot.c
-# chmod  +x qRoot
-
-# echo " ! Running Square Root Functions ! "
-# time ./sRoot
-# echo
-
-# echo " ! Running Qube Root Functions ! "
-# time ./qRoot
-# echo

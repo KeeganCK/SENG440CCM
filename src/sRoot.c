@@ -16,7 +16,7 @@ void squareRoot(double inputVal)
     int i = 0;
     for (i; i <= 31; i++)
     {
-        unsigned uint32_t factor =
+        // unsigned uint32_t factor =
         // unsigned short int factor = 1 + shiftValueRightBy(1,i);
         // unsigned int precision = f * factor * factor;
         // unsigned int precision_squareRoot = f_squareRoot * factor;

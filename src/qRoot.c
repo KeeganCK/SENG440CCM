@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 int printOutput = 1;
 
@@ -23,8 +24,8 @@ void cubeRoot(double M)
         }
     }
 
-    if (printOutput)
-        printf("\tThe Cube Root is:\t\t%1.9lf\n", f_sqrt_3);
+    // if (printOutput)
+    //     printf("\tThe Cube Root is:\t\t%1.9lf\n", f_sqrt_3);
 }
 
 int main(int argc, char *argv[])
@@ -32,17 +33,14 @@ int main(int argc, char *argv[])
     //unsigned short int inputVal = 3.5;
     double inputVals[8] = {1, 1.5, 2, 2.5, 4, 6, 8, 5.123456789};
 
-    int i = 0;
-    for (i; i < 8; i++)
+    int i = 0, j = 0;
+    for (i; i < 100000; i++)
     {
-        double inputValue = inputVals[i];
-        if (printOutput)
-        {
-            printf("\nInput value: \t\t\t\t%lf\n", inputValue);
+        for(j = 0; j < 8; j++) {
+            double inputValue = inputVals[j];
+            cubeRoot(inputValue);
         }
-        cubeRoot(inputValue);
     }
-
     printf("\n");
     return 0;
 }

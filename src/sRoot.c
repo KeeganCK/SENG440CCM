@@ -2,50 +2,78 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-int printOutput = 1;
-
-double powerArray[32] = {1, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.0000152587890625, 0.00000762939453125, 0.000003814697265625, 0.0000019073486328125, 0.00000095367431640625, 0.000000476837158203125, 0.0000002384185791015625, 0.00000011920928955078125, 0.00000005960464477539063, 0.000000029802322387695312, 0.000000014901161193847656, 0.000000007450580596923828, 0.000000003725290298461914, 0.000000001862645149230957, 0.0000000009313225746154785};
+int testing = 0;
 
 // void squareRoot(unsigned short int inputVal)
-void squareRoot(double inputVal)
+uint32_t squareRoot(uint64_t M)
 {
-    //unsigned short int f = 1.0;
-    //unsigned int f_squareRoot = 1.0;
-    double f = 1.0;
-    double f_squareRoot = 1.0;
+    uint32_t f = 32768;
+    uint32_t  f_sqrt = 32768;
     int i = 0;
-    for (i; i <= 31; i++)
+    for (i; i < 32; i++)
     {
-        // unsigned uint32_t factor =
-        // unsigned short int factor = 1 + shiftValueRightBy(1,i);
-        // unsigned int precision = f * factor * factor;
-        // unsigned int precision_squareRoot = f_squareRoot * factor;
+        if(testing) printf("Iteration %d\n",i);
 
-        //double factor = 1.0 + powerArray[i];
-        double precision = f * (1.0 + powerArray[i]) * (1.0 + powerArray[i]);
-        double precision_squareRoot = f_squareRoot * (1.0 + powerArray[i]);
+        uint32_t u = f + (f >> i);
+        u = u + (u >> i);
+                
+        uint32_t u_sqrt =  f_sqrt + (f_sqrt >> i);
 
-        if (precision <= inputVal)
+        if(testing)printf("\tu:\t %d\n", u);
+
+        if (u <= M)
         {
-            f = precision;
-            f_squareRoot = precision_squareRoot;
+            f = u;
+            f_sqrt = u_sqrt;
+			if(testing)printf("\t f_sqrt:\t%d\n",  f_sqrt);
         }
+        if(testing)printf("\n");
     }
+	return  f_sqrt;
+}
+
+int32_t isqrt(int32_t num) {
+    int32_t res = 0;
+    int32_t bit = 1 << 30; // The second-to-top bit is set.
+                           // Same as ((unsigned) INT32_MAX + 1) / 2.
+
+    // "bit" starts at the highest power of four <= the argument.
+    while (bit > num)
+        bit >>= 2;
+
+    while (bit != 0) {
+        if (num >= res + bit) {
+            num -= res + bit;
+            res = (res >> 1) + bit;
+        } else
+            res >>= 1;
+        bit >>= 2;
+    }
+    return res;
 }
 
 int main(int argc, char *argv[])
 {
     //unsigned short int inputVal = 3.5;
-    double inputVals[8] = {1, 1.5, 2, 2.5, 4, 6, 8, 5.123456789};
+    float inputVals[7] = {1, 1.75, 2, 2.25, 3, 3.5, 3.999};
+    //int inputVals[4] = {1, 2, 3, 4};
 
     int i = 0, j = 0;
-    for (i; i < 100000; i++)
-    {
-        for(j = 0; j < 8; j++) {
-            double inputValue = inputVals[j];
-            squareRoot(inputValue);
+    //for (i; i < 100000; i++){
+        for(j = 0; j < 4; j++) {
+            float inputValue = inputVals[j];
+			uint64_t scaledUpValue = (uint64_t)(inputValue * 32768); // *16384 == <<14
+            uint64_t outputValue = squareRoot(scaledUpValue); 
+            float scaledDownValue = ((float)outputValue)/32768; // /32768 == >>(7 + 8) +8 to accomidate for the addition 8 bits of u
+            //float scaledDownValue = ((float)outputValue)/128; // /128 == >>7
+			
+            printf("Input: \t\t%1.3f\n",inputValue);
+            printf("Scaled up: \t%d\n",scaledUpValue);
+            printf("Output: \t%d\n",outputValue);
+            printf("Scaled Down: \t%1.3f\n",scaledDownValue);
+            printf("\n");
         }
-    }
+    // }
 
     printf("\n");
     return 0;

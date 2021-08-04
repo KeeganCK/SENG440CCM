@@ -1,79 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 
-int testing = 0;
+int testingResults = 1;
 
 // void squareRoot(unsigned short int inputVal)
-uint32_t squareRoot(uint64_t M)
+int32_t squareRoot(int32_t M)
 {
-    uint32_t f = 32768;
-    uint32_t  f_sqrt = 32768;
-    int i = 0;
-    for (i; i < 32; i++)
+    register int32_t f = 16384;
+    register int32_t  f_sqrt = 16384;
+    register int32_t local_M = M;
+    
+    register int i;
+    // for (i^=i; i<32; i++) //4.22s
+    for(i^=i;!(i&32);i++) //4.30s
     {
-        if(testing) printf("Iteration %d\n",i);
+        register int32_t u = f + (f >> i);
+        int32_t u_sqrt =  f_sqrt + (f_sqrt >> i); //moved from below (time not taken)
+        u = u + (u >> i); 
 
-        uint32_t u = f + (f >> i);
-        u = u + (u >> i);
-                
-        uint32_t u_sqrt =  f_sqrt + (f_sqrt >> i);
-
-        if(testing)printf("\tu:\t %d\n", u);
-
-        if (u <= M)
+        if (u <= local_M)
+        //if ((u-local_M-1)&2147483648)
         {
             f = u;
             f_sqrt = u_sqrt;
-			if(testing)printf("\t f_sqrt:\t%d\n",  f_sqrt);
         }
-        if(testing)printf("\n");
     }
 	return  f_sqrt;
 }
 
-int32_t isqrt(int32_t num) {
-    int32_t res = 0;
-    int32_t bit = 1 << 30; // The second-to-top bit is set.
-                           // Same as ((unsigned) INT32_MAX + 1) / 2.
-
-    // "bit" starts at the highest power of four <= the argument.
-    while (bit > num)
-        bit >>= 2;
-
-    while (bit != 0) {
-        if (num >= res + bit) {
-            num -= res + bit;
-            res = (res >> 1) + bit;
-        } else
-            res >>= 1;
-        bit >>= 2;
-    }
-    return res;
-}
-
 int main(int argc, char *argv[])
 {
-    //unsigned short int inputVal = 3.5;
     float inputVals[7] = {1, 1.75, 2, 2.25, 3, 3.5, 3.999};
-    //int inputVals[4] = {1, 2, 3, 4};
 
-    int i = 0, j = 0;
-    //for (i; i < 100000; i++){
-        for(j = 0; j < 4; j++) {
-            float inputValue = inputVals[j];
-			uint64_t scaledUpValue = (uint64_t)(inputValue * 32768); // *16384 == <<14
-            uint64_t outputValue = squareRoot(scaledUpValue); 
-            float scaledDownValue = ((float)outputValue)/32768; // /32768 == >>(7 + 8) +8 to accomidate for the addition 8 bits of u
-            //float scaledDownValue = ((float)outputValue)/128; // /128 == >>7
-			
-            printf("Input: \t\t%1.3f\n",inputValue);
-            printf("Scaled up: \t%d\n",scaledUpValue);
-            printf("Output: \t%d\n",outputValue);
-            printf("Scaled Down: \t%1.3f\n",scaledDownValue);
-            printf("\n");
+    int i = 0;
+    if(testingResults){
+        for(i; i < 7; i++) {
+            float inputValue = inputVals[i];
+            int32_t scaledUpValue = (int32_t)(inputValue * 16384); // *16384 == <<14
+            int32_t outputValue = squareRoot(scaledUpValue); 
+            float scaledDownValue = ((float)outputValue)/16384; // /16384 == >>14
+        
+            printf("The Square Root of %1.3f is %f\n", inputValue, scaledDownValue);
         }
-    // }
+    } else {
+        int32_t inputValue = (int32_t)(1.75 * 16384);
+        for(i; i < 1000000; i++) squareRoot(inputValue);
+    }
+    
 
     printf("\n");
     return 0;

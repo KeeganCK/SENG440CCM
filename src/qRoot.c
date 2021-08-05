@@ -1,46 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 
-int printOutput = 1;
+int testingResults = 0;
 
-double powerArray[32] = {1, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125, 0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625, 0.000030517578125, 0.0000152587890625, 0.00000762939453125, 0.000003814697265625, 0.0000019073486328125, 0.00000095367431640625, 0.000000476837158203125, 0.0000002384185791015625, 0.00000011920928955078125, 0.00000005960464477539063, 0.000000029802322387695312, 0.000000014901161193847656, 0.000000007450580596923828, 0.000000003725290298461914, 0.000000001862645149230957, 0.0000000009313225746154785};
-
-void cubeRoot(double M)
+// void cubeRoot(unsigned short int inputVal)
+int32_t cubeRoot(int32_t M)
 {
+    register int32_t f = 16384;
+    register int32_t  f_sqrt = 16384;
+    register int32_t local_M = M;
+    
+    register int i;
 
-    double f = 1.0;
-    double f_sqrt_3 = 1.0;
+    register int32_t u = f<<3; // == f*8
+    int32_t u_sqrt =  f_sqrt<<1; // == u_sqrt*2 == u_sqrt + (u_sqrt>>0)
 
-    int i = 0;
-    for (i; i < 31; i++)
+    for (i=1; i<16; i++) // prefered
+    // for(i^=i;!(i&16);i++) 
     {
-        double var = f * (1 + powerArray[i]) * (1 + powerArray[i]) * (1 + powerArray[i]);
-        double var_sqrt_3 = f_sqrt_3 * (1 + powerArray[i]);
-        if (var <= M)
+        if (u <= local_M) //prefered
+        // if ((u-local_M-1)&2147483648)
         {
-            f = var;
-            f_sqrt_3 = var_sqrt_3;
+            f = u;
+            f_sqrt = u_sqrt;
         }
+
+        u = f + (f >> i);
+        u_sqrt =  f_sqrt + (f_sqrt >> i);
+        u = u + (u >> i);
+        u = u + (u >> i);      
     }
 
-    // if (printOutput)
-    //     printf("\tThe Cube Root is:\t\t%1.9lf\n", f_sqrt_3);
+    if (u <= local_M) //prefered
+    // if ((u-local_M-1)&2147483648)
+    {
+        f = u;
+        f_sqrt = u_sqrt;
+    }
+	return  f_sqrt;
 }
 
 int main(int argc, char *argv[])
 {
     //unsigned short int inputVal = 3.5;
-    double inputVals[8] = {1, 1.5, 2, 2.5, 4, 6, 8, 5.123456789};
+    float inputVals[7] = {1, 2.75, 3, 4.25, 5, 6.5, 7.999};
 
-    int i = 0, j = 0;
-    for (i; i < 100000; i++)
-    {
-        for(j = 0; j < 8; j++) {
-            double inputValue = inputVals[j];
-            cubeRoot(inputValue);
+    int i = 0;
+    if(testingResults){
+        for(i; i < 7; i++) {
+            float inputValue = inputVals[i];
+            int32_t scaledUpValue = (int32_t)(inputValue * 16384); // *16384 == <<14
+            int32_t outputValue = cubeRoot(scaledUpValue); 
+            float scaledDownValue = ((float)outputValue)/16384; // /16384 == >>14
+        
+            printf("The Square Root of %1.3f is %f\n", inputValue, scaledDownValue);
         }
+    } else {
+        int32_t inputValue = (int32_t)(1.75 * 16384);
+        for(i; i < 1000000; i++) cubeRoot(inputValue);
     }
+    
+
     printf("\n");
     return 0;
 }

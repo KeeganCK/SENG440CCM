@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int testingResults = 1;
+int testingResults = 0;
 
 // void squareRoot(unsigned short int inputVal)
 int32_t squareRoot(int32_t M)

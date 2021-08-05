@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int testingResults = 0;
+int testingResults = 1;
 
 // void squareRoot(unsigned short int inputVal)
 int32_t squareRoot(int32_t M)
@@ -15,7 +15,7 @@ int32_t squareRoot(int32_t M)
     register int32_t u = f<<2; // == 4*f
     register int32_t u_sqrt =  f_sqrt<<1; // 2*f_sqrt
        
-    // for (i^=i; i<32; i++)
+    // for (i=1; i<16; i++)
     for(i=1;!(i&16);i++) //prefered
     {
         if (u <= local_M) // prefered
@@ -29,6 +29,18 @@ int32_t squareRoot(int32_t M)
         u_sqrt =  f_sqrt + (f_sqrt >> i);
         u = u + (u >> i);
 
+        if (u <= local_M) // prefered
+        // if ((u-local_M-1)&2147483648)
+        {
+            f = u;
+            f_sqrt = u_sqrt;
+        }
+
+        i++;
+        u = f + (f >> i);
+        u_sqrt =  f_sqrt + (f_sqrt >> i);
+        u = u + (u >> i);
+        
     }
     if (u <= local_M) // prefered
     // if ((u-local_M-1)&2147483648)

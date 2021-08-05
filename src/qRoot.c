@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int testingResults = 0;
+int testingResults = 1;
 
 // void cubeRoot(unsigned short int inputVal)
 int32_t cubeRoot(int32_t M)
@@ -13,10 +13,10 @@ int32_t cubeRoot(int32_t M)
     register int i;
 
     register int32_t u = f<<3; // == f*8
-    int32_t u_sqrt =  f_sqrt<<1; // == u_sqrt*2 == u_sqrt + (u_sqrt>>0)
+    register int32_t u_sqrt =  f_sqrt<<1; // == u_sqrt*2 == u_sqrt + (u_sqrt>>0)
 
     for (i=1; i<16; i++) // prefered
-    // for(i^=i;!(i&16);i++) 
+    // for(i=1;!(i&16);i++) 
     {
         if (u <= local_M) //prefered
         // if ((u-local_M-1)&2147483648)
@@ -28,7 +28,20 @@ int32_t cubeRoot(int32_t M)
         u = f + (f >> i);
         u_sqrt =  f_sqrt + (f_sqrt >> i);
         u = u + (u >> i);
-        u = u + (u >> i);      
+        u = u + (u >> i);    
+
+        if (u <= local_M) //prefered
+        // if ((u-local_M-1)&2147483648)
+        {
+            f = u;
+            f_sqrt = u_sqrt;
+        }
+
+        i++;
+        u = f + (f >> i);
+        u_sqrt =  f_sqrt + (f_sqrt >> i);
+        u = u + (u >> i);
+        u = u + (u >> i);     
     }
 
     if (u <= local_M) //prefered
